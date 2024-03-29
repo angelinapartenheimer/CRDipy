@@ -45,6 +45,19 @@ def equatorial2horizontal(ra, dec):
 ####### Event generation #######
 
 def generate_events(healpy_map, nside = 128, galCoord = False, number_events = 32000, zenith_cut_deg = 80, outfile = None): 
+
+'''From a Healpy skymap, generate events as they would be observed by the Pierre Auger Observatory. The event generation accounts for a zenith cut (default cut at zenith = 80° following arXiv:1709.07321) as well as zenith-dependent event selection. The function generates number_events observed events with right ascension ('RA'), declination ('DEC'), azimuth ('AZ'), and zenith ('ZEN') of each event.
+    
+    If an output file path is provided, the function writes event coordinates to the output file. If no output file path is provided, the function returns a dict{} of event coordinates.
+    
+    Parameters: 
+    healpy_map: the Healpy skymap from which to generate events
+    nside: nside of the input Healpy map. Default is nside = 128. 
+    galCoord: True if the skymap is in Galactic coordinates, False if it is in equatorial coordinates. Default galCoord = False.
+    number_events: the number of observed events that will be generated. Default number_events = 32000
+    zenith_cut_deg: the zenith cut to be imposed in degrees. Default zenith_cut_deg = 80. 
+    outfile: path to the output file where event coordinates will be written. If None, returns a dict{} of event coordinates. Default outfile = None.
+    '''
     
     if galCoord: 
         r = hp.rotator.Rotator(coord = ['G', 'C'])
@@ -118,6 +131,15 @@ def Rayleigh(angle, get_b = False):
 
 
 def get_dipole(events):
+
+    ''' Using a set of events with right ascension, declination, zenith, and azimuthal angle data, evaluate the large-scale dipole anisotropy in equatorial coordinates.
+    The function performs Rayleigh analysis in right ascension and azimuthal angle of events, accounting for the latitude of the Pierre Auger Observatory. 
+    The Rayleigh analysis follows the analysis outlined in 'arXiv:1709.07321.
+    
+    Parameters: 
+    events: key:value pairs of 'RA' (right-ascension), 'DEC' (declination), 'AZ' (azimuth), and 'ZEN' (zenith) angles of event data. 
+    The event data can be input as a dictionary or read in from a text file, which are both formats returned by generate_events().'''
+    
     
     ra = events['RA']
     dec = events['DEC']
